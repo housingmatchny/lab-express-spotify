@@ -1,0 +1,19 @@
+{{!-- A track object comes with a preview_url, which is the source for a 30-second preview of a particular song. You can plug this into an HTML audio tag, and it will play the preview. --}}
+
+<nav><a href="/home">Home</a></nav>
+
+{{#each tracks}}
+
+    <h3>{{name}}</h3>
+
+    {{#if preview_url}}
+
+        <audio src={{preview_url}} controls></audio>
+
+        {{else}}
+
+          <p>No track preview found</p>
+
+    {{/if}}
+
+{{/each}}

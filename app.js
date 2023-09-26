@@ -27,61 +27,52 @@ const spotifyApi = new SpotifyWebApi({
 // Our routes go here:
 app.get('/home', (req, res) => res.render('home.hbs'));
 
-
-// spotifyApi
-//   .searchArtists(/*'HERE GOES THE QUERY ARTIST'*/)
-//   .then(data => {
-//     console.log('The received data from the API: ', data.body);
-//     // ----> 'HERE'S WHAT WE WANT TO DO AFTER RECEIVING THE DATA FROM THE API'
-//   })
-//   .catch(err => console.log('The error while searching artists occurred: ', err));
-
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post('/artist-search', (req,res) => {
+app.post('/artist-search', (req, res, next) => {
   let { artistName } = req.body
   // console.log(req.body);
   spotifyApi
   .searchArtists(artistName)
-  .then(req => {
-    console.log('The received data from the API: ', req.body);
-    console.log(req.body.artists.items[0]);
-    res.render('artist-search-results.hbs');
+  .then(data => {
+    console.log('The received data from the API: ', data.body);
+    console.log(data.body.artists.items);
+    const results = data.body.artists.items; //array
+    res.render('artist-search-results.hbs', { results });
     // ----> 'HERE'S WHAT WE WANT TO DO AFTER RECEIVING THE DATA FROM THE API'
   })
   .catch(err => console.log('The error while searching artists occurred: ', err));
 })
+//sending data to the server to be saved
 
 app.get('/albums/:artistId', (req, res, next) => {
-  // let { artistId } = req.body.
-  // console.log(req.body.artists.id);
-  // req.send(req.params);
+  const artistId = req.params.artistId;
+  console.log(artistId);
   spotifyApi
-  .getArtistAlbums('4MCBfE4596Uoi2O4DtmEMz', { limit: 10 })
-  .then(function(req) {
-    console.log(req.body);
-    // return req.body.albums.map(function(a) {
-    //   return a.id;
-    // });
+  .getArtistAlbums(artistId, { limit: 10 })
+  .then((data) => {
+    console.log(data.body.items);
+    const album = data.body.items //album results
+    res.render('albums.hbs', { album });
+    //console.log(req.body);
   })
+  .catch((err) => {
+    console.log('Error while getting artist albums: ', err)
+  })
+})
 
-
-  // .then(function(albums) {
-  //   return spotifyApi.getAlbums(albums);
-  // })
-  // .then(function(res) {
-  //   console.log(res.body);
-  // });
-});
-
-app.get('/tracks', (req, res, next) => {
+app.get('/tracks/:tracksId', (req, res, next) => {
+    let {tracksId} = req.params 
     spotifyApi
-    .getAlbumTracks('4MCBfE4596Uoi2O4DtmEMz', { limit : 5, offset : 1 })
-    .then(req => {
-    console.log(req.body);
-  }, 
-  function(err) {
+    .getAlbumTracks(tracksId)
+    .then(data => {
+      console.log(data.body.items); 
+
+      const tracks = data.body.items //track results
+      res.render('tracks.hbs', { tracks });
+  }) 
+    .catch((err) => {
     console.log('Something went wrong!', err);
   });
 })
@@ -90,3 +81,34 @@ app.get('/tracks', (req, res, next) => {
 
 
 app.listen(3000, () => console.log('My Spotify project running on port 3000 🎧 🥁 🎸 🔊'));
+
+// Album Results  
+//{album_group: 'single',
+// album_type: 'single',
+// artists: [ [Object] ],
+// available_markets: [
+//   'AR', 'AU', 'AT', 'BE', 'BO', 'BR', 'BG', 'CA', 'CL', 'CO',
+//   'CR', 'CY', 'CZ', 'DK', 'DO', 'DE', 'EC', 'EE', 'SV', 'FI',
+//   'FR', 'GR', 'GT', 'HN', 'HK', 'HU', 'IS', 'IE', 'IT', 'LV',
+//   'LT', 'LU', 'MY', 'MT', 'MX', 'NL', 'NZ', 'NI', 'NO', 'PA',
+//   'PY', 'PE', 'PH', 'PL', 'PT', 'SG', 'SK', 'ES', 'SE', 'CH',
+//   'TW', 'TR', 'UY', 'US', 'GB', 'AD', 'LI', 'MC', 'ID', 'JP',
+//   'TH', 'VN', 'RO', 'IL', 'ZA', 'SA', 'AE', 'BH', 'QA', 'OM',
+//   'KW', 'EG', 'MA', 'DZ', 'TN', 'LB', 'JO', 'PS', 'IN', 'KZ',
+//   'MD', 'UA', 'AL', 'BA', 'HR', 'ME', 'MK', 'RS', 'SI', 'KR',
+//   'BD', 'PK', 'LK', 'GH', 'KE', 'NG', 'TZ', 'UG', 'AG', 'AM',
+//   ... 83 more items
+// ],
+// external_urls: {
+//   spotify: 'https://open.spotify.com/album/2thP70nudcFpvmRl3AsYRa'
+// },
+// href: 'https://api.spotify.com/v1/albums/2thP70nudcFpvmRl3AsYRa',
+// id: '2thP70nudcFpvmRl3AsYRa',
+// images: [ [Object], [Object], [Object] ],
+// name: 'The Light',
+// release_date: '2023-03-23',
+// release_date_precision: 'day',
+// total_tracks: 1,
+// type: 'album',
+// uri: 'spotify:album:2thP70nudcFpvmRl3AsYRa'
+// },

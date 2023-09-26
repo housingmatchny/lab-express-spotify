@@ -1,10 +1,19 @@
 {{!-- So let's create a new page - albums.hbs where all the results will be displayed. Make sure you show the name and the cover of each album and add a button/link to see the tracks (next iteration). --}}
 
-<form action="/" method="POST">
-  <label for="artist-name">Artist name</label>
-  
-  <label for="cover">Cover</label>
+<nav><a href="/home">Home</a></nav>
 
-  <button type="submit">View tracks</button>
-</form>
+{{#each album}}
 
+  {{#if images.1.url}}
+    <img src={{images.1.url}} alt="decorative image">
+  {{else}}
+    <p>No image found</p>
+  {{/if}}
+
+  <h2>{{name}}</h2>
+
+  <form action="/tracks/{{id}}" method="GET"> 
+    <button type="submit">View Tracks</button>
+  </form>
+
+{{/each}}

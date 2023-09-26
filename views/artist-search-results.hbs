@@ -1,6 +1,20 @@
 {{!-- display the name, image, and button (or link) to show the albums for a particular artist on a new view (for now just create the button/link and we will take care of the rest in the next step).  --}}
-<form action="/albums/:artistId" method="GET"> 
-  <button type="submit">View Albums</button>
-</form>
+<nav><a href="/home">Home</a></nav>
+
+{{#each results}}
+  
+  {{#if images.1.url}}
+    <img src={{images.1.url}} alt="decorative image">
+  {{else}}
+    <p>No image found</p>
+  {{/if}}
+
+  <h2>{{name}}</h2>
+
+  <form action="/albums/{{id}}" method="GET"> 
+    <button type="submit">View Albums</button>
+  </form>
+
+{{/each}}
 {{!-- <a href="/albums/someArtistIdGoesHere">View Albums</a> --}}
 
